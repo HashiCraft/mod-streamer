@@ -6,7 +6,8 @@ import org.apache.logging.log4j.Logger;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -17,27 +18,18 @@ public class ModBlock extends Block {
 
   private static final Logger LOGGER = LogManager.getLogger();
 
+  @Override
+  public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+    if (!world.isRemote) {
+      LOGGER.info("Block placed, client call");
+      YouTubePlayer player = new YouTubePlayer();
+      player.Play();
+    }
+  }
+
   public ModBlock() {
       super(props);
       this.setRegistryName(blockName);
-  }
-
-  @Override
-  boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-
-    LOGGER.info("Clicked on block", worldIn.isRemote);
-    if (worldIn.isRemote) { 
-      return true;
-    }
-      
-    YouTubePlayer mp = new YouTubePlayer();
-    mp.Play(); 
-
-    return false;
-  }
-  public void onBlockClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
-    super.onBlockClicked(state, worldIn, pos, player);
-
   }
 
 }

@@ -1,19 +1,21 @@
 package io.hashicraft.stream;
 
-import uk.co.caprica.vlcj.player.headless.HeadlessMediaPlayer;
-import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
-import uk.co.caprica.vlcj.discovery.NativeDiscovery;
-import uk.co.caprica.vlcj.player.MediaPlayer;
-import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
-import uk.co.caprica.vlcj.player.MediaPlayerFactory;
+import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
+import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
+import uk.co.caprica.vlcj.media.Media;
+import uk.co.caprica.vlcj.media.MediaEventAdapter;
+import uk.co.caprica.vlcj.media.MediaRef;
+import uk.co.caprica.vlcj.medialist.MediaList;
+import uk.co.caprica.vlcj.player.base.MediaPlayer;
+import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
+
 import uk.co.caprica.vlcj.binding.LibVlc;
 import com.sun.jna.NativeLibrary;
 import java.awt.Canvas;
@@ -55,12 +57,13 @@ public class YouTubePlayer {
 
       if(NATIVE_LIBRARY_SEARCH_PATH != null) {
         LOGGER.info("Explicitly adding JNA native library search path: '{}'", NATIVE_LIBRARY_SEARCH_PATH);
-        NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), NATIVE_LIBRARY_SEARCH_PATH);
+        NativeLibrary.addSearchPath(uk.co.caprica.vlcj.binding.RuntimeUtil.getLibVlcLibraryName(),
+            NATIVE_LIBRARY_SEARCH_PATH);
       }
 
       boolean found = new NativeDiscovery().discover();
 		  LOGGER.info("Found LibVLC {}", found);
-      LOGGER.info("Version {}", LibVlc.INSTANCE.libvlc_get_version());
+      LOGGER.info("Version {}", LibVlc.libvlc_get_version());
 
       System.setProperty("jna.dump_memory", DUMP_NATIVE_MEMORY);
       //Canvas vs = new Canvas();
@@ -71,11 +74,12 @@ public class YouTubePlayer {
       //mediaPlayer = factory.newHeadlessMediaPlayer();
       //mediaPlayer.setVideoSurface(factory.newVideoSurface(vs));
       Canvas vs = new Canvas();
-      mediaPlayer = factory.newEmbeddedMediaPlayer();
+      mediaPlayer = factory.mediaPlayers().newEmbeddedMediaPlayer();
       //mediaPlayer.setVideoSurface(factory.newVideoSurface(vs));
-      mediaPlayer.setPlaySubItems(true); // <--- This is very important for YouTube media
+      //mediaPlayer.setPlaySubItems(true); // <--- This is very important for YouTube media
 
-      mediaPlayer.addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
+      /*
+      mediaPlayer.events().addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
           @Override
           public void buffering(MediaPlayer mediaPlayer, float newCache) {
               LOGGER.info("Buffering " + newCache);
@@ -83,13 +87,15 @@ public class YouTubePlayer {
 
           @Override
           public void mediaSubItemAdded(MediaPlayer mediaPlayer, libvlc_media_t subItem) {
-              List<String> items = mediaPlayer.subItems();
+              String items = mediaPlayer.media().subitems().toString();
               LOGGER.info("items", items);
           }
       });
+      */
     }
 
     public void Play() {
-        mediaPlayer.playMedia("https://www.youtube.com/watch?v=6g0-pDRmtHs");
+        mediaPlayer.media().prepare("https://www.youtube.com/watch?v=6g0-pDRmtHs");
+        mediaPlayer.controls().play();
     }
 }

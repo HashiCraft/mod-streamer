@@ -109,7 +109,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    compile group: 'uk.co.caprica', name: 'vlcj', version: '3.12.1'
+    compile group: 'uk.co.caprica', name: 'vlcj', version: '4.4.2'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
